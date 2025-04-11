@@ -11,7 +11,12 @@ class Game {
         this.bonusWords = ['少','年','得','到','7', '周', '年', '生', '日', '快', '乐'];
         this.bonusProgress = [];
         this.tileSpeed = 2;
-        this.sounds = {};
+        this.sounds = {
+            click: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU'),
+            bonus: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU'),
+            gameOver: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU'),
+            win: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU')
+        };
         this.initSounds();
         this.init();
         this.startTime = 0;
@@ -93,8 +98,21 @@ class Game {
         }
     }
 
+    playSound(soundName) {
+        try {
+            const sound = this.sounds[soundName];
+            if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log('播放音效失败:', e));
+            }
+        } catch (e) {
+            console.log('播放音效失败:', e);
+        }
+    }
+
     handleTileClick(tile) {
         if (!tile.classList.contains('gold-tile') && !tile.classList.contains('bonus-tile')) {
+            this.playSound('gameOver');
             this.gameOver();
             return;
         }
@@ -102,15 +120,16 @@ class Game {
         if (tile.classList.contains('bonus-tile')) {
             const word = tile.dataset.word;
             if (this.bonusWords[this.bonusProgress.length] === word) {
-                this.sounds.bonus.play();
+                this.playSound('bonus');
                 this.bonusProgress.push(word);
                 this.score += Math.floor(Math.random() * 5 + 1) * 20;
             } else {
+                this.playSound('gameOver');
                 this.gameOver();
                 return;
             }
         } else {
-            this.sounds.click.play();
+            this.playSound('click');
             this.score += 10;
         }
 
@@ -233,7 +252,7 @@ class Game {
 
     gameOver() {
         this.stopTimer();
-        this.sounds.gameOver.play();
+        this.playSound('gameOver');
         this.gameRunning = false;
         this.updateBestScore();
         this.messageElement.textContent = '游戏结束！最终得分：' + this.score;
@@ -257,7 +276,7 @@ class Game {
 
     gameWin() {
         this.stopTimer();
-        this.sounds.win.play();
+        this.playSound('win');
         this.gameRunning = false;
         this.updateBestScore();
         

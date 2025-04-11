@@ -17,7 +17,7 @@ class Game {
         this.startTime = 0;
         this.timerInterval = null;
         this.timerElement = document.getElementById('timer');
-        this.initLeaderboard();
+        this.leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
     }
 
     initSounds() {
@@ -178,47 +178,48 @@ class Game {
         const playerName = prompt('请输入您的名字：');
         if (!playerName) return;
 
-        try {
-            const response = await fetch('/api/submit-score', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    playerName,
-                    score: this.score,
-                    time: gameTime,
-                    completed: isCompleted
-                })
-            });
-            
-            if (response.ok) {
-                this.showLeaderboard();
-            }
-        } catch (error) {
-            console.error('提交分数失败:', error);
-        }
+        // 添加到本地排行榜
+        this.leaderboard.push({
+            playerName,
+            score: this.score,
+            time: gameTime,
+            completed: isCompleted,
+            date: new Date().toISOString()
+        });
+
+        // 按分数排序
+        this.leaderboard.sort((a, b) => b.score - a.score);
+
+        // 只保留前10名
+        this.leaderboard = this.leaderboard.slice(0, 10);
+
+        // 保存到localStorage
+        localStorage.setItem('leaderboard', JSON.stringify(this.leaderboard));
+
+        // 显示排行榜
+        this.showLeaderboard();
     }
 
     async loadLeaderboard(type = 'score') {
-        try {
-            const response = await fetch(`/api/leaderboard?type=${type}`);
-            const data = await response.json();
-            
-            const leaderboardElement = document.getElementById(`${type}Leaderboard`);
-            leaderboardElement.innerHTML = data.map((entry, index) => `
-                <div class="leaderboard-entry">
-                    <span class="rank">${index + 1}</span>
-                    <span class="name">${entry.playerName}</span>
-                    <span class="value">${type === 'score' ? 
-                        entry.score + '分' : 
-                        Math.floor(entry.time / 60) + ':' + (entry.time % 60).toString().padStart(2, '0')
-                    }</span>
-                </div>
-            `).join('');
-        } catch (error) {
-            console.error('加载排行榜失败:', error);
-        }
+        const leaderboardElement = document.getElementById(`${type}Leaderboard`);
+        const sortedLeaderboard = [...this.leaderboard].sort((a, b) => {
+            if (type === 'score') {
+                return b.score - a.score;
+            } else {
+                return a.time - b.time;
+            }
+        });
+
+        leaderboardElement.innerHTML = sortedLeaderboard.map((entry, index) => `
+            <div class="leaderboard-entry">
+                <span class="rank">${index + 1}</span>
+                <span class="name">${entry.playerName}</span>
+                <span class="value">${type === 'score' ? 
+                    entry.score + '分' : 
+                    Math.floor(entry.time / 60) + ':' + (entry.time % 60).toString().padStart(2, '0')
+                }</span>
+            </div>
+        `).join('');
     }
 
     showLeaderboard() {

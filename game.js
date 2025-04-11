@@ -12,10 +12,10 @@ class Game {
         this.bonusProgress = [];
         this.tileSpeed = 2;
         this.sounds = {
-            click: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU'),
-            bonus: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU'),
-            gameOver: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU'),
-            win: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU')
+            click: new Audio('sounds/click.mp3'),
+            bonus: new Audio('sounds/bonus.mp3'),
+            gameOver: new Audio('sounds/gameover.mp3'),
+            win: new Audio('sounds/win.mp3')
         };
         this.initSounds();
         this.init();
@@ -23,14 +23,20 @@ class Game {
         this.timerInterval = null;
         this.timerElement = document.getElementById('timer');
         this.leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+        this.init();
     }
 
     initSounds() {
         // 创建音效
-        this.sounds.click = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU');
-        this.sounds.bonus = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU');
-        this.sounds.gameOver = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU');
-        this.sounds.win = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU');
+        this.sounds.click = new Audio('sounds/click.mp3');
+        this.sounds.bonus = new Audio('sounds/bonus.mp3');
+        this.sounds.gameOver = new Audio('sounds/gameover.mp3');
+        this.sounds.win = new Audio('sounds/win.mp3');
+        
+        // 预加载音效
+        Object.values(this.sounds).forEach(sound => {
+            sound.load();
+        });
     }
 
     init() {
@@ -71,31 +77,36 @@ class Game {
     }
 
     createNewRow() {
-        const goldPosition = Math.floor(Math.random() * 4);
+        const row = document.createElement('div');
+        row.className = 'row';
+        
+        // 随机决定是否生成奖励方块
+        const hasBonus = Math.random() < 0.3;
+        const bonusPosition = hasBonus ? Math.floor(Math.random() * 4) : -1;
+        
         for (let i = 0; i < 4; i++) {
             const tile = document.createElement('div');
             tile.className = 'tile';
-            tile.style.left = (i * 75) + 'px';
-            tile.style.top = '-100px';
-
-            if (i === goldPosition) {
-                const isBonus = Math.random() < 0.3 && this.bonusProgress.length < this.bonusWords.length;
-                if (isBonus) {
-                    tile.className = 'tile bonus-tile';
-                    const nextBonusWord = this.bonusWords[this.bonusProgress.length];
-                    tile.textContent = nextBonusWord;
-                    tile.dataset.bonus = 'true';
-                    tile.dataset.word = nextBonusWord;
-                } else {
-                    tile.className = 'tile gold-tile';
-                    tile.textContent = Math.random() < 0.5 ? '$' : '￥';
-                }
+            
+            if (i === bonusPosition) {
+                tile.classList.add('bonus-tile');
+                const nextBonusWord = this.bonusWords[this.bonusProgress.length];
+                tile.textContent = nextBonusWord;
+                tile.dataset.bonus = 'true';
+                tile.dataset.word = nextBonusWord;
+            } else {
+                tile.classList.add('gold-tile');
+                tile.textContent = Math.random() < 0.5 ? '$' : '￥';
             }
-
+            
+            tile.style.left = (i * 70) + 'px';
+            tile.style.top = '-60px';
             tile.addEventListener('click', () => this.handleTileClick(tile));
-            this.container.appendChild(tile);
+            row.appendChild(tile);
             this.tiles.push(tile);
         }
+        
+        this.container.appendChild(row);
     }
 
     playSound(soundName) {
@@ -194,8 +205,12 @@ class Game {
 
     async submitScore(isCompleted) {
         const gameTime = Math.floor((Date.now() - this.startTime) / 1000);
-        const playerName = prompt('请输入您的名字：');
-        if (!playerName) return;
+        let playerName = prompt('请输入您的名字：');
+        
+        if (!playerName) {
+            const names = ['七周年', '少年得到', '生日快乐'];
+            playerName = names[Math.floor(Math.random() * names.length)];
+        }
 
         // 添加到本地排行榜
         this.leaderboard.push({

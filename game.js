@@ -62,10 +62,16 @@ class Game {
             this.updateTimer();
         }, 800);
         
-        // 添加更频繁的更新
-        this.animationInterval = setInterval(() => {
-            this.updateTiles();
-        }, 16); // 约60fps
+        // 使用 requestAnimationFrame 实现更流畅的动画
+        let lastTime = 0;
+        const animate = (currentTime) => {
+            if (currentTime - lastTime >= 16) { // 约60fps
+                this.updateTiles();
+                lastTime = currentTime;
+            }
+            this.animationFrame = requestAnimationFrame(animate);
+        };
+        this.animationFrame = requestAnimationFrame(animate);
     }
 
     reset() {
@@ -78,8 +84,8 @@ class Game {
         if (this.gameInterval) {
             clearInterval(this.gameInterval);
         }
-        if (this.animationInterval) {
-            clearInterval(this.animationInterval);
+        if (this.animationFrame) {
+            cancelAnimationFrame(this.animationFrame);
         }
         this.updateScore();
     }
@@ -125,7 +131,9 @@ class Game {
             tile.style.top = '-60px';
             tile.style.zIndex = this.tiles.length + 1;
             tile.style.transition = 'top 0.05s linear';
-            tile.addEventListener('click', () => this.handleTileClick(tile));
+            if (!tile.classList.contains('white-tile')) {
+                tile.addEventListener('click', () => this.handleTileClick(tile));
+            }
             row.appendChild(tile);
             this.tiles.push(tile);
         }
@@ -141,6 +149,7 @@ class Game {
                 this.gameOver(false);
                 return;
             }
+            // 统一所有方块的下落速度
             tile.style.top = (top + 2) + 'px';
             tile.style.zIndex = Math.floor(top / 60);
         }

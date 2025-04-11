@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>少年得到7周年生日游戏</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:,">
 </head>
 <body>
     <div class="container">
@@ -14,7 +15,9 @@
             <div class="time">时间: <span id="time">0:00</span></div>
         </div>
 
-        <div id="game-container">
+        <div class="game-wrapper">
+            <div id="game-container"></div>
+            
             <div class="start-screen" id="startScreen">
                 <div class="game-instructions">
                     <h2>游戏说明</h2>
@@ -22,8 +25,10 @@
                     <p>按顺序点击"少年得到7周年生日快乐"可以获得额外奖励！</p>
                     <p>错过方块或点击错误方块游戏结束。</p>
                 </div>
-                <button class="start-btn" id="startBtn">开始游戏</button>
-                <button class="leaderboard-btn" id="leaderboardBtn">查看排行榜</button>
+                <div class="button-container">
+                    <button class="start-btn" id="startBtn">开始游戏</button>
+                    <button class="leaderboard-btn" id="leaderboardBtn">查看排行榜</button>
+                </div>
             </div>
         </div>
 

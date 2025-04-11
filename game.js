@@ -56,11 +56,12 @@ class Game {
             this.startScreen.style.display = 'none';
         }
         this.startTime = Date.now();
+        // 加快方块生成速度
         this.gameInterval = setInterval(() => {
             this.createNewRow();
             this.updateTiles();
             this.updateTimer();
-        }, 1000);
+        }, 800);
     }
 
     reset() {
@@ -83,6 +84,12 @@ class Game {
         const hasBonus = Math.random() < 0.3;
         const bonusPosition = hasBonus ? Math.floor(Math.random() * 4) : -1;
         
+        // 计算每个方块之间的间距，确保平均分布
+        const tileWidth = 60;
+        const containerWidth = this.container.offsetWidth;
+        const totalGap = containerWidth - (4 * tileWidth);
+        const gap = totalGap / 5; // 5个间隔（4个方块之间有5个间隔）
+        
         for (let i = 0; i < 4; i++) {
             const tile = document.createElement('div');
             tile.className = 'tile';
@@ -93,12 +100,17 @@ class Game {
                 tile.textContent = nextBonusWord;
                 tile.dataset.bonus = 'true';
                 tile.dataset.word = nextBonusWord;
+                const bonusScores = [20, 40, 60, 80, 100];
+                tile.dataset.score = bonusScores[Math.floor(Math.random() * bonusScores.length)];
             } else {
                 tile.classList.add('gold-tile');
                 tile.textContent = Math.random() < 0.5 ? '$' : '￥';
+                tile.dataset.score = 10;
             }
             
-            tile.style.left = (i * 70) + 'px';
+            // 计算每个方块的位置，确保平均分布
+            const left = gap + (i * (tileWidth + gap));
+            tile.style.left = left + 'px';
             tile.style.top = '-60px';
             tile.addEventListener('click', () => this.handleTileClick(tile));
             row.appendChild(tile);
@@ -116,7 +128,8 @@ class Game {
                 this.gameOver(false);
                 return;
             }
-            tile.style.top = (top + 2) + 'px';
+            // 增加下落速度
+            tile.style.top = (top + 4) + 'px';
         }
     }
 

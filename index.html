@@ -10,9 +10,18 @@
     <div class="container">
         <div class="score-container">
             <div class="score">分数: <span id="score">0</span></div>
+            <div class="best-score">最高分: <span id="bestScore">0</span></div>
             <div class="time">时间: <span id="timer">0:00</span></div>
         </div>
-        <div id="game-container"></div>
+        <div id="game-container">
+            <div class="start-screen" id="startScreen">
+                <h2>游戏说明</h2>
+                <p>1. 点击金色方块($,￥)得10分</p>
+                <p>2. 按顺序点击"少年得到7周年生日快乐"</p>
+                <p>3. 特殊文字方块20-100分</p>
+                <p>4. 错过或点错即游戏结束</p>
+            </div>
+        </div>
         <div class="message" id="message"></div>
         <div class="start-btn" id="startBtn">开始游戏</div>
         <div class="leaderboard-btn" id="showLeaderboard">查看排行榜</div>
@@ -20,6 +29,7 @@
 
     <div class="leaderboard-modal" id="leaderboardModal">
         <div class="leaderboard-content">
+            <h2>排行榜</h2>
             <div class="tab-container">
                 <button class="tab-btn active" data-tab="score">分数排行</button>
                 <button class="tab-btn" data-tab="time">时间排行</button>

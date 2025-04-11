@@ -1,86 +1,47 @@
 class Game {
-    constructor() {
-        this.container = document.getElementById('game-container');
-        this.scoreElement = document.getElementById('score');
-        this.bestScoreElement = document.getElementById('bestScore');
-        this.messageElement = document.getElementById('message');
+    constructor(container) {
+        this.container = container;
         this.score = 0;
-        this.bestScore = localStorage.getItem('bestScore') || 0;
-        this.tiles = [];
-        this.gameRunning = false;
-        this.bonusWords = ['少','年','得','到','7', '周', '年', '生', '日', '快', '乐'];
-        this.bonusProgress = [];
-        this.tileSpeed = 2;
-        this.sounds = {
-            click: new Audio('sounds/click.mp3'),
-            bonus: new Audio('sounds/bonus.mp3'),
-            gameOver: new Audio('sounds/gameover.mp3'),
-            win: new Audio('sounds/win.mp3')
-        };
-        this.initSounds();
-        this.init();
+        this.highScore = parseInt(localStorage.getItem('highScore')) || 0;
         this.startTime = 0;
-        this.timerInterval = null;
-        this.timerElement = document.getElementById('timer');
+        this.gameInterval = null;
+        this.tiles = [];
+        this.bonusWords = ['少', '年', '得', '到', '7', '周', '年', '生', '日', '快', '乐'];
+        this.bonusProgress = [];
         this.leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
         this.init();
     }
 
-    initSounds() {
-        // 创建音效
-        this.sounds.click = new Audio('sounds/click.mp3');
-        this.sounds.bonus = new Audio('sounds/bonus.mp3');
-        this.sounds.gameOver = new Audio('sounds/gameover.mp3');
-        this.sounds.win = new Audio('sounds/win.mp3');
-        
-        // 预加载音效
-        Object.values(this.sounds).forEach(sound => {
-            sound.load();
-        });
-    }
-
     init() {
-        this.bestScoreElement.textContent = this.bestScore;
-        document.getElementById('startBtn').addEventListener('click', () => this.startGame());
+        this.updateScore();
+        this.updateHighScore();
+        this.updateTimer();
     }
 
-    initLeaderboard() {
-        // 初始化排行榜相关事件
-        document.getElementById('showLeaderboard').addEventListener('click', () => this.showLeaderboard());
-        document.getElementById('closeLeaderboard').addEventListener('click', () => this.hideLeaderboard());
-        
-        // 标签切换事件
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                const tab = e.target.dataset.tab;
-                document.getElementById('scoreLeaderboard').style.display = tab === 'score' ? 'block' : 'none';
-                document.getElementById('timeLeaderboard').style.display = tab === 'time' ? 'block' : 'none';
-                this.loadLeaderboard(tab);
-            });
-        });
-    }
-
-    startGame() {
-        this.container.innerHTML = '';
-        this.score = 0;
-        this.scoreElement.textContent = this.score;
-        this.gameRunning = true;
-        this.bonusProgress = [];
-        this.messageElement.textContent = '';
-        this.tileSpeed = 2;
-        this.createNewRow();
-        this.gameLoop();
+    start() {
+        this.reset();
+        document.getElementById('startScreen').style.display = 'none';
         this.startTime = Date.now();
-        this.startTimer();
+        this.gameInterval = setInterval(() => {
+            this.createNewRow();
+            this.updateTiles();
+            this.updateTimer();
+        }, 1000);
+    }
+
+    reset() {
+        this.score = 0;
+        this.tiles = [];
+        this.bonusProgress = [];
+        this.container.innerHTML = '';
+        clearInterval(this.gameInterval);
+        this.updateScore();
     }
 
     createNewRow() {
         const row = document.createElement('div');
         row.className = 'row';
         
-        // 随机决定是否生成奖励方块
         const hasBonus = Math.random() < 0.3;
         const bonusPosition = hasBonus ? Math.floor(Math.random() * 4) : -1;
         
@@ -109,98 +70,71 @@ class Game {
         this.container.appendChild(row);
     }
 
-    playSound(soundName) {
-        try {
-            const sound = this.sounds[soundName];
-            if (sound) {
-                sound.currentTime = 0;
-                sound.play().catch(e => console.log('播放音效失败:', e));
+    updateTiles() {
+        for (let i = this.tiles.length - 1; i >= 0; i--) {
+            const tile = this.tiles[i];
+            const top = parseFloat(tile.style.top);
+            if (top > this.container.offsetHeight) {
+                this.gameOver(false);
+                return;
             }
-        } catch (e) {
-            console.log('播放音效失败:', e);
+            tile.style.top = (top + 2) + 'px';
         }
     }
 
     handleTileClick(tile) {
-        if (!tile.classList.contains('gold-tile') && !tile.classList.contains('bonus-tile')) {
-            this.playSound('gameOver');
-            this.gameOver();
-            return;
-        }
-
-        if (tile.classList.contains('bonus-tile')) {
-            const word = tile.dataset.word;
-            if (this.bonusWords[this.bonusProgress.length] === word) {
-                this.playSound('bonus');
-                this.bonusProgress.push(word);
-                this.score += Math.floor(Math.random() * 5 + 1) * 20;
-            } else {
-                this.playSound('gameOver');
-                this.gameOver();
-                return;
-            }
-        } else {
-            this.playSound('click');
-            this.score += 10;
-        }
-
-        this.scoreElement.textContent = this.score;
-        tile.style.visibility = 'hidden';
-
-        if (this.bonusProgress.length === this.bonusWords.length) {
-            this.gameWin();
-        }
-
-        // 每得100分增加一点速度
-        this.tileSpeed = 2 + Math.floor(this.score / 100) * 0.5;
-    }
-
-    updateBestScore() {
-        if (this.score > this.bestScore) {
-            this.bestScore = this.score;
-            this.bestScoreElement.textContent = this.bestScore;
-            localStorage.setItem('bestScore', this.bestScore);
-        }
-    }
-
-    gameLoop() {
-        if (!this.gameRunning) return;
-
-        this.tiles.forEach(tile => {
-            const currentTop = parseFloat(tile.style.top);
-            tile.style.top = (currentTop + this.tileSpeed) + 'px';
-
-            if (currentTop > 400) {
-                if (tile.classList.contains('gold-tile') || tile.classList.contains('bonus-tile')) {
-                    this.gameOver();
+        const index = this.tiles.indexOf(tile);
+        if (index !== -1) {
+            this.tiles.splice(index, 1);
+            tile.remove();
+            
+            if (tile.dataset.bonus === 'true') {
+                const word = tile.dataset.word;
+                if (word === this.bonusWords[this.bonusProgress.length]) {
+                    this.bonusProgress.push(word);
+                    this.score += 20;
+                    if (this.bonusProgress.length === this.bonusWords.length) {
+                        this.score += 100;
+                        this.bonusProgress = [];
+                    }
+                } else {
+                    this.gameOver(false);
                     return;
                 }
-                this.container.removeChild(tile);
-                this.tiles = this.tiles.filter(t => t !== tile);
+            } else {
+                this.score += 10;
             }
-        });
-
-        if (this.tiles.length === 0 || parseFloat(this.tiles[this.tiles.length - 1].style.top) > 0) {
-            this.createNewRow();
+            
+            this.updateScore();
+            if (this.score > this.highScore) {
+                this.highScore = this.score;
+                this.updateHighScore();
+                localStorage.setItem('highScore', this.highScore);
+            }
         }
-
-        requestAnimationFrame(() => this.gameLoop());
     }
 
-    startTimer() {
-        this.timerInterval = setInterval(() => {
+    updateScore() {
+        document.getElementById('score').textContent = this.score;
+    }
+
+    updateHighScore() {
+        document.getElementById('highScore').textContent = this.highScore;
+    }
+
+    updateTimer() {
+        if (this.startTime) {
             const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
             const minutes = Math.floor(elapsed / 60);
             const seconds = elapsed % 60;
-            this.timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }, 1000);
+            document.getElementById('time').textContent = 
+                minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+        }
     }
 
-    stopTimer() {
-        if (this.timerInterval) {
-            clearInterval(this.timerInterval);
-            this.timerInterval = null;
-        }
+    gameOver(isCompleted) {
+        clearInterval(this.gameInterval);
+        this.submitScore(isCompleted);
     }
 
     async submitScore(isCompleted) {
@@ -212,7 +146,6 @@ class Game {
             playerName = names[Math.floor(Math.random() * names.length)];
         }
 
-        // 添加到本地排行榜
         this.leaderboard.push({
             playerName,
             score: this.score,
@@ -221,101 +154,52 @@ class Game {
             date: new Date().toISOString()
         });
 
-        // 按分数排序
         this.leaderboard.sort((a, b) => b.score - a.score);
-
-        // 只保留前10名
         this.leaderboard = this.leaderboard.slice(0, 10);
-
-        // 保存到localStorage
         localStorage.setItem('leaderboard', JSON.stringify(this.leaderboard));
-
-        // 显示排行榜
         this.showLeaderboard();
-    }
-
-    async loadLeaderboard(type = 'score') {
-        const leaderboardElement = document.getElementById(`${type}Leaderboard`);
-        const sortedLeaderboard = [...this.leaderboard].sort((a, b) => {
-            if (type === 'score') {
-                return b.score - a.score;
-            } else {
-                return a.time - b.time;
-            }
-        });
-
-        leaderboardElement.innerHTML = sortedLeaderboard.map((entry, index) => `
-            <div class="leaderboard-entry">
-                <span class="rank">${index + 1}</span>
-                <span class="name">${entry.playerName}</span>
-                <span class="value">${type === 'score' ? 
-                    entry.score + '分' : 
-                    Math.floor(entry.time / 60) + ':' + (entry.time % 60).toString().padStart(2, '0')
-                }</span>
-            </div>
-        `).join('');
     }
 
     showLeaderboard() {
         document.getElementById('leaderboardModal').style.display = 'flex';
-        this.loadLeaderboard('score');
+        this.showScoreLeaderboard();
     }
 
     hideLeaderboard() {
         document.getElementById('leaderboardModal').style.display = 'none';
     }
 
-    gameOver() {
-        this.stopTimer();
-        this.playSound('gameOver');
-        this.gameRunning = false;
-        this.updateBestScore();
-        this.messageElement.textContent = '游戏结束！最终得分：' + this.score;
-        
-        // 提交分数
-        this.submitScore(false);
-
-        setTimeout(() => {
-            this.container.innerHTML = `
-                <div class="start-screen">
-                    <h2>游戏结束</h2>
-                    <p>本次得分：${this.score}</p>
-                    <p>最高记录：${this.bestScore}</p>
-                    <div class="start-btn" id="startBtn">重新开始</div>
-                    <div class="leaderboard-btn" id="showLeaderboard">查看排行榜</div>
-                </div>
-            `;
-            this.init();
-        }, 2000);
+    showScoreLeaderboard() {
+        this.updateLeaderboardList(this.leaderboard.sort((a, b) => b.score - a.score));
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.textContent === '分数排行');
+        });
     }
 
-    gameWin() {
-        this.stopTimer();
-        this.playSound('win');
-        this.gameRunning = false;
-        this.updateBestScore();
-        
-        // 提交通关分数
-        this.submitScore(true);
+    showTimeLeaderboard() {
+        this.updateLeaderboardList(this.leaderboard.sort((a, b) => a.time - b.time));
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.textContent === '时间排行');
+        });
+    }
 
-        this.messageElement.textContent = '恭喜通关！生日快乐！最终得分：' + this.score;
-        setTimeout(() => {
-            this.container.innerHTML = `
-                <div class="start-screen">
-                    <h2>恭喜通关！</h2>
-                    <p>生日快乐！</p>
-                    <p>本次得分：${this.score}</p>
-                    <p>通关时间：${this.timerElement.textContent}</p>
-                    <div class="start-btn" id="startBtn">再玩一次</div>
-                    <div class="leaderboard-btn" id="showLeaderboard">查看排行榜</div>
-                </div>
+    updateLeaderboardList(sortedLeaderboard) {
+        const list = document.getElementById('leaderboardList');
+        list.innerHTML = '';
+        sortedLeaderboard.forEach((entry, index) => {
+            const item = document.createElement('div');
+            item.className = 'leaderboard-entry';
+            item.innerHTML = `
+                <span class="rank">${index + 1}</span>
+                <span class="name">${entry.playerName}</span>
+                <span class="value">${entry.score}分 ${entry.time}秒</span>
             `;
-            this.init();
-        }, 2000);
+            list.appendChild(item);
+        });
     }
 }
 
-window.onload = () => new Game();
+window.onload = () => new Game(document.getElementById('game-container'));
 
 // 修改获取随机用户名的函数
 function getRandomUsername(ip) {

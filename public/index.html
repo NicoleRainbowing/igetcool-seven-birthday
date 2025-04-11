@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>七周年生日快乐</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="score">分数：<span id="score">0</span></div>
+            <div class="best-score">最高分：<span id="bestScore">0</span></div>
+            <div class="time">时间：<span id="timer">0:00</span></div>
+        </div>
+        <div id="game-container">
+            <div class="start-screen" id="startScreen">
+                <h2>七周年生日快乐</h2>
+                <p>1. 错过或点错金色方块即游戏结束</p>
+                <p>2. 金色方块10分，特殊文字方块20-100分</p>
+                <p>3. 顺序收集"少年得到7周年生日快乐"可进入通关计时榜</p>
+                <p>4. 同IP匿名在排行榜上刷出收集文字有特殊奖励</p>
+                <div class="start-btn" id="startBtn">开始游戏</div>
+                <div class="leaderboard-btn" id="showLeaderboard">查看排行榜</div>
+            </div>
+        </div>
+        <div class="message" id="message"></div>
+        
+        <!-- 排行榜弹窗 -->
+        <div class="leaderboard-modal" id="leaderboardModal">
+            <div class="leaderboard-content">
+                <h2>排行榜</h2>
+                <div class="tab-container">
+                    <button class="tab-btn active" data-tab="score">分数排行</button>
+                    <button class="tab-btn" data-tab="time">通关时长</button>
+                </div>
+                <div class="leaderboard-list" id="scoreLeaderboard"></div>
+                <div class="leaderboard-list" id="timeLeaderboard" style="display: none;"></div>
+                <button class="close-btn" id="closeLeaderboard">关闭</button>
+            </div>
+        </div>
+    </div>
+    <script src="game.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</body>
+</html> 

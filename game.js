@@ -56,19 +56,23 @@ class Game {
             this.startScreen.style.display = 'none';
         }
         this.startTime = Date.now();
-        this.gameInterval = setInterval(() => {
-            this.createNewRow();
-            this.updateTiles();
-            this.updateTimer();
-        }, 800);
         
         // 使用 requestAnimationFrame 实现更流畅的动画
         let lastTime = 0;
+        let lastRowTime = 0;
         const animate = (currentTime) => {
             if (currentTime - lastTime >= 16) { // 约60fps
                 this.updateTiles();
                 lastTime = currentTime;
             }
+            
+            // 每800ms生成一行新方块
+            if (currentTime - lastRowTime >= 800) {
+                this.createNewRow();
+                this.updateTimer();
+                lastRowTime = currentTime;
+            }
+            
             this.animationFrame = requestAnimationFrame(animate);
         };
         this.animationFrame = requestAnimationFrame(animate);
@@ -142,16 +146,20 @@ class Game {
     }
 
     updateTiles() {
+        let shouldGameOver = false;
         for (let i = this.tiles.length - 1; i >= 0; i--) {
             const tile = this.tiles[i];
             const top = parseFloat(tile.style.top);
             if (top > this.container.offsetHeight) {
-                this.gameOver(false);
-                return;
+                shouldGameOver = true;
+                break;
             }
-            // 统一所有方块的下落速度
             tile.style.top = (top + 2) + 'px';
             tile.style.zIndex = Math.floor(top / 60);
+        }
+        
+        if (shouldGameOver) {
+            this.gameOver(false);
         }
     }
 

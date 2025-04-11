@@ -22,8 +22,8 @@
                     <p>按顺序点击"少年得到7周年生日快乐"可以获得额外奖励！</p>
                     <p>错过方块或点击错误方块游戏结束。</p>
                 </div>
-                <button class="start-btn" onclick="game.start()">开始游戏</button>
-                <button class="leaderboard-btn" onclick="game.showLeaderboard()">查看排行榜</button>
+                <button class="start-btn" id="startBtn">开始游戏</button>
+                <button class="leaderboard-btn" id="leaderboardBtn">查看排行榜</button>
             </div>
         </div>
 
@@ -31,18 +31,27 @@
             <div class="leaderboard-content">
                 <h2>排行榜</h2>
                 <div class="tab-container">
-                    <button class="tab-btn active" onclick="game.showScoreLeaderboard()">分数排行</button>
-                    <button class="tab-btn" onclick="game.showTimeLeaderboard()">时间排行</button>
+                    <button class="tab-btn active" id="scoreTab">分数排行</button>
+                    <button class="tab-btn" id="timeTab">时间排行</button>
                 </div>
                 <div id="leaderboardList" class="leaderboard-list"></div>
-                <button class="close-btn" onclick="game.hideLeaderboard()">关闭</button>
+                <button class="close-btn" id="closeLeaderboard">关闭</button>
             </div>
         </div>
     </div>
 
     <script src="game.js"></script>
     <script>
-        const game = new Game(document.getElementById('game-container'));
+        document.addEventListener('DOMContentLoaded', function() {
+            const game = new Game(document.getElementById('game-container'));
+            
+            // 添加事件监听器
+            document.getElementById('startBtn').addEventListener('click', () => game.start());
+            document.getElementById('leaderboardBtn').addEventListener('click', () => game.showLeaderboard());
+            document.getElementById('closeLeaderboard').addEventListener('click', () => game.hideLeaderboard());
+            document.getElementById('scoreTab').addEventListener('click', () => game.showScoreLeaderboard());
+            document.getElementById('timeTab').addEventListener('click', () => game.showTimeLeaderboard());
+        });
     </script>
 </body>
 </html> 

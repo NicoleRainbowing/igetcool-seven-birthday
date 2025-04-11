@@ -1,6 +1,8 @@
 class Game {
     constructor(container) {
         this.container = container;
+        this.gameContainer = document.getElementById('game-container');
+        this.startScreen = document.getElementById('startScreen');
         this.score = 0;
         this.highScore = parseInt(localStorage.getItem('highScore')) || 0;
         this.startTime = 0;
@@ -16,11 +18,21 @@ class Game {
         this.updateScore();
         this.updateHighScore();
         this.updateTimer();
+        // 确保游戏区域是空的
+        this.gameContainer.innerHTML = '';
+        // 显示开始屏幕
+        if (this.startScreen) {
+            this.startScreen.style.display = 'block';
+        }
     }
 
     start() {
+        if (!this.gameContainer) return;
+        
         this.reset();
-        document.getElementById('startScreen').style.display = 'none';
+        if (this.startScreen) {
+            this.startScreen.style.display = 'none';
+        }
         this.startTime = Date.now();
         this.gameInterval = setInterval(() => {
             this.createNewRow();
@@ -33,8 +45,12 @@ class Game {
         this.score = 0;
         this.tiles = [];
         this.bonusProgress = [];
-        this.container.innerHTML = '';
-        clearInterval(this.gameInterval);
+        if (this.gameContainer) {
+            this.gameContainer.innerHTML = '';
+        }
+        if (this.gameInterval) {
+            clearInterval(this.gameInterval);
+        }
         this.updateScore();
     }
 

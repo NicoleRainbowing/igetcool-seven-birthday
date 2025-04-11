@@ -56,12 +56,16 @@ class Game {
             this.startScreen.style.display = 'none';
         }
         this.startTime = Date.now();
-        // 加快方块生成速度
         this.gameInterval = setInterval(() => {
             this.createNewRow();
             this.updateTiles();
             this.updateTimer();
         }, 800);
+        
+        // 添加更频繁的更新
+        this.animationInterval = setInterval(() => {
+            this.updateTiles();
+        }, 16); // 约60fps
     }
 
     reset() {
@@ -74,6 +78,9 @@ class Game {
         if (this.gameInterval) {
             clearInterval(this.gameInterval);
         }
+        if (this.animationInterval) {
+            clearInterval(this.animationInterval);
+        }
         this.updateScore();
     }
 
@@ -81,6 +88,8 @@ class Game {
         const row = document.createElement('div');
         row.className = 'row';
         
+        // 确保每行只有一个金色块
+        const goldPosition = Math.floor(Math.random() * 4);
         const hasBonus = Math.random() < 0.3;
         const bonusPosition = hasBonus ? Math.floor(Math.random() * 4) : -1;
         
@@ -88,13 +97,17 @@ class Game {
         const tileWidth = 60;
         const containerWidth = this.container.offsetWidth;
         const totalGap = containerWidth - (4 * tileWidth);
-        const gap = totalGap / 5; // 5个间隔（4个方块之间有5个间隔）
+        const gap = totalGap / 5;
         
         for (let i = 0; i < 4; i++) {
             const tile = document.createElement('div');
             tile.className = 'tile';
             
-            if (i === bonusPosition) {
+            if (i === goldPosition) {
+                tile.classList.add('gold-tile');
+                tile.textContent = Math.random() < 0.5 ? '$' : '￥';
+                tile.dataset.score = 10;
+            } else if (i === bonusPosition) {
                 tile.classList.add('bonus-tile');
                 const nextBonusWord = this.bonusWords[this.bonusProgress.length];
                 tile.textContent = nextBonusWord;
@@ -103,16 +116,15 @@ class Game {
                 const bonusScores = [20, 40, 60, 80, 100];
                 tile.dataset.score = bonusScores[Math.floor(Math.random() * bonusScores.length)];
             } else {
-                tile.classList.add('gold-tile');
-                tile.textContent = Math.random() < 0.5 ? '$' : '￥';
-                tile.dataset.score = 10;
+                tile.classList.add('white-tile');
+                tile.textContent = '';
             }
             
-            // 计算每个方块的位置，确保平均分布
             const left = gap + (i * (tileWidth + gap));
             tile.style.left = left + 'px';
             tile.style.top = '-60px';
-            tile.style.zIndex = this.tiles.length + 1; // 确保新生成的方块在最上层
+            tile.style.zIndex = this.tiles.length + 1;
+            tile.style.transition = 'top 0.05s linear';
             tile.addEventListener('click', () => this.handleTileClick(tile));
             row.appendChild(tile);
             this.tiles.push(tile);
@@ -129,9 +141,7 @@ class Game {
                 this.gameOver(false);
                 return;
             }
-            // 增加下落速度
-            tile.style.top = (top + 4) + 'px';
-            // 更新z-index，确保下方的方块不会被上方的方块遮挡
+            tile.style.top = (top + 2) + 'px';
             tile.style.zIndex = Math.floor(top / 60);
         }
     }

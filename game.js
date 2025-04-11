@@ -1,8 +1,17 @@
 class Game {
     constructor(container) {
+        if (!container) {
+            throw new Error('Game container is required');
+        }
+        
         this.container = container;
         this.gameContainer = document.getElementById('game-container');
         this.startScreen = document.getElementById('startScreen');
+        
+        if (!this.gameContainer || !this.startScreen) {
+            throw new Error('Required game elements not found');
+        }
+        
         this.score = 0;
         this.highScore = parseInt(localStorage.getItem('highScore')) || 0;
         this.startTime = 0;
@@ -11,18 +20,31 @@ class Game {
         this.bonusWords = ['少', '年', '得', '到', '7', '周', '年', '生', '日', '快', '乐'];
         this.bonusProgress = [];
         this.leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
-        this.init();
+        
+        try {
+            this.init();
+        } catch (error) {
+            console.error('Error initializing game:', error);
+            throw error;
+        }
     }
 
     init() {
-        this.updateScore();
-        this.updateHighScore();
-        this.updateTimer();
-        // 确保游戏区域是空的
-        this.gameContainer.innerHTML = '';
-        // 显示开始屏幕
-        if (this.startScreen) {
-            this.startScreen.style.display = 'block';
+        try {
+            this.updateScore();
+            this.updateHighScore();
+            this.updateTimer();
+            // 确保游戏区域是空的
+            if (this.gameContainer) {
+                this.gameContainer.innerHTML = '';
+            }
+            // 显示开始屏幕
+            if (this.startScreen) {
+                this.startScreen.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Error in init:', error);
+            throw error;
         }
     }
 
@@ -214,8 +236,6 @@ class Game {
         });
     }
 }
-
-window.onload = () => new Game(document.getElementById('game-container'));
 
 // 修改获取随机用户名的函数
 function getRandomUsername(ip) {

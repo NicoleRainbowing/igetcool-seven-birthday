@@ -42,15 +42,43 @@
 
     <script src="game.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const game = new Game(document.getElementById('game-container'));
-            
-            // 添加事件监听器
-            document.getElementById('startBtn').addEventListener('click', () => game.start());
-            document.getElementById('leaderboardBtn').addEventListener('click', () => game.showLeaderboard());
-            document.getElementById('closeLeaderboard').addEventListener('click', () => game.hideLeaderboard());
-            document.getElementById('scoreTab').addEventListener('click', () => game.showScoreLeaderboard());
-            document.getElementById('timeTab').addEventListener('click', () => game.showTimeLeaderboard());
+        // 等待DOM和游戏脚本完全加载
+        window.addEventListener('load', function() {
+            try {
+                const gameContainer = document.getElementById('game-container');
+                if (!gameContainer) {
+                    console.error('Game container not found');
+                    return;
+                }
+
+                const game = new Game(gameContainer);
+                
+                // 添加事件监听器
+                const elements = {
+                    startBtn: document.getElementById('startBtn'),
+                    leaderboardBtn: document.getElementById('leaderboardBtn'),
+                    closeLeaderboard: document.getElementById('closeLeaderboard'),
+                    scoreTab: document.getElementById('scoreTab'),
+                    timeTab: document.getElementById('timeTab')
+                };
+
+                // 检查所有必需的元素是否存在
+                for (const [key, element] of Object.entries(elements)) {
+                    if (!element) {
+                        console.error(`${key} not found`);
+                        return;
+                    }
+                }
+
+                // 添加事件监听器
+                elements.startBtn.addEventListener('click', () => game.start());
+                elements.leaderboardBtn.addEventListener('click', () => game.showLeaderboard());
+                elements.closeLeaderboard.addEventListener('click', () => game.hideLeaderboard());
+                elements.scoreTab.addEventListener('click', () => game.showScoreLeaderboard());
+                elements.timeTab.addEventListener('click', () => game.showTimeLeaderboard());
+            } catch (error) {
+                console.error('Error initializing game:', error);
+            }
         });
     </script>
 </body>

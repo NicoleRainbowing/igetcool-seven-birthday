@@ -33,6 +33,10 @@ jobs:
           cp index.html dist/
           cp style.css dist/
           cp game.js dist/
+          cp server.js dist/
+          cp -r node_modules dist/
+          cp package.json dist/
+          cp package-lock.json dist/
       
       - name: Setup Pages
         uses: actions/configure-pages@v3

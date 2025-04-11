@@ -112,6 +112,7 @@ class Game {
             const left = gap + (i * (tileWidth + gap));
             tile.style.left = left + 'px';
             tile.style.top = '-60px';
+            tile.style.zIndex = this.tiles.length + 1; // 确保新生成的方块在最上层
             tile.addEventListener('click', () => this.handleTileClick(tile));
             row.appendChild(tile);
             this.tiles.push(tile);
@@ -130,6 +131,8 @@ class Game {
             }
             // 增加下落速度
             tile.style.top = (top + 4) + 'px';
+            // 更新z-index，确保下方的方块不会被上方的方块遮挡
+            tile.style.zIndex = Math.floor(top / 60);
         }
     }
 

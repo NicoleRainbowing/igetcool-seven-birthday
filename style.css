@@ -65,10 +65,38 @@ body {
 /* 游戏方块样式 */
 .tile {
     position: absolute;
-    width: 25%;
-    height: 100px;
+    box-sizing: border-box;
+    border: 2px solid #333; /* 添加深色边框 */
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.2s ease;
+    /* 添加阴影效果增强立体感 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tile.gold {
+    background-color: #FFD700;
+    color: #000;
+    /* 为金色块添加特殊效果 */
+    border: 2px solid #B8860B;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.tile.pink {
+    background-color: #FFC0CB;
+    color: #000;
+    border: 2px solid #FF69B4;
+}
+
+.tile.white {
+    background-color: #fff;
+    /* 增加白色块的可见度 */
+    border: 2px solid #ccc;
 }
 
 .gold-tile {
@@ -341,16 +369,6 @@ body {
     animation: none;
 }
 
-.tile.gold {
-    background-color: #FFD700;
-    color: #000;
-}
-
-.tile.pink {
-    background-color: #FFC0CB;
-    color: #000;
-}
-
 #collection-progress {
     position: fixed;
     top: 10px;
@@ -359,4 +377,22 @@ body {
     padding: 10px;
     border-radius: 5px;
     font-size: 16px;
+}
+
+/* 在现有的 .leaderboard-entry 样式后添加 */
+.leaderboard-entry.current-player {
+    background: rgba(255, 79, 0, 0.2) !important;
+    border-left: 4px solid var(--hermes-orange);
+    transform: scale(1.02);
+    font-weight: bold;
+}
+
+.leaderboard-entry.current-player:hover {
+    background: rgba(255, 79, 0, 0.25) !important;
+    transform: scale(1.02) translateX(5px);
+}
+
+.leaderboard-entry.current-player .name,
+.leaderboard-entry.current-player .value {
+    color: var(--hermes-orange-dark);
 } 

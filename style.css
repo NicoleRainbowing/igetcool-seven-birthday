@@ -91,10 +91,63 @@ body {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+/* 修改按钮样式 */
+.start-btn, .leaderboard-btn {
+    display: inline-block;
+    padding: 15px 40px;
+    margin: 15px 10px;
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent; /* 移动端点击高亮 */
+}
+
+.start-btn {
+    background: linear-gradient(145deg, var(--hermes-orange), var(--hermes-orange-light));
+    color: white;
+    box-shadow: 0 6px 20px rgba(255, 79, 0, 0.3);
+    border: none;
+    position: relative;
+    z-index: 1;
+}
+
+.leaderboard-btn {
+    background: white;
+    color: var(--hermes-orange);
+    border: 2px solid var(--hermes-orange);
+    position: relative;
+    z-index: 1;
+}
+
+/* 添加按钮悬停和点击效果 */
+.start-btn:hover, .leaderboard-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 79, 0, 0.4);
+}
+
+.start-btn:active, .leaderboard-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 4px 15px rgba(255, 79, 0, 0.3);
+}
+
 /* 开始界面样式 */
 .start-screen {
-    padding: 30px;
-    text-align: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 2;
 }
 
 .start-screen h2 {
@@ -106,30 +159,6 @@ body {
 .start-screen p {
     margin: 10px 0;
     color: #333;
-}
-
-/* 按钮样式 */
-.start-btn, .leaderboard-btn {
-    display: inline-block;
-    padding: 15px 40px;
-    margin: 10px;
-    border-radius: 30px;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.start-btn {
-    background: linear-gradient(145deg, var(--hermes-orange), var(--hermes-orange-light));
-    color: white;
-    box-shadow: 0 6px 20px rgba(255, 79, 0, 0.3);
-}
-
-.leaderboard-btn {
-    background: white;
-    color: var(--hermes-orange);
-    border: 2px solid var(--hermes-orange);
 }
 
 /* 排行榜样式 */

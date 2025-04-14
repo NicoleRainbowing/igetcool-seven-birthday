@@ -49,9 +49,11 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@fireworks-js/web@2.10.7/dist/index.umd.js"></script>
-    <script src="public/game.js"></script>
+    <script src="./public/game.js"></script>
     <script>
-        new Game();
+        document.addEventListener('DOMContentLoaded', function() {
+            new Game();
+        });
     </script>
 </body>
 </html> 

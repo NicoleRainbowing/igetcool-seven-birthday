@@ -299,4 +299,7 @@ class Game {
         `;
         this.addEventListeners();
     }
-} 
+}
+
+// 添加全局导出
+window.Game = Game; 

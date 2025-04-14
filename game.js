@@ -20,6 +20,7 @@ class Game {
         this.bonusWords = ['少', '年', '得', '到', '7', '周', '年', '生', '日', '快', '乐'];
         this.bonusProgress = [];
         this.leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+        this.scoreSubmitted = false;
         
         try {
             this.init();
@@ -82,6 +83,7 @@ class Game {
         this.score = 0;
         this.tiles = [];
         this.bonusProgress = [];
+        this.scoreSubmitted = false;
         if (this.gameContainer) {
             this.gameContainer.innerHTML = '';
         }
@@ -214,11 +216,18 @@ class Game {
     }
 
     gameOver(isCompleted) {
-        clearInterval(this.gameInterval);
+        if (this.animationFrame) {
+            cancelAnimationFrame(this.animationFrame);
+        }
         this.submitScore(isCompleted);
     }
 
     async submitScore(isCompleted) {
+        if (this.scoreSubmitted) {
+            return;
+        }
+        this.scoreSubmitted = true;
+
         const gameTime = Math.floor((Date.now() - this.startTime) / 1000);
         let playerName = prompt('请输入您的名字：');
         

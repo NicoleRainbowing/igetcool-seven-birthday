@@ -3,88 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>少年得到7周年生日游戏</title>
+    <title>七周年生日快乐</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="data:,">
 </head>
 <body>
     <div class="container">
-        <div class="score-container">
+        <div class="header">
             <div class="score">分数: <span id="score">0</span></div>
-            <div class="high-score">最高分: <span id="highScore">0</span></div>
+            <div class="best-score">最高分: <span id="bestScore">0</span></div>
             <div class="time">时间: <span id="time">0:00</span></div>
         </div>
-
-        <div class="game-wrapper">
-            <div id="game-container"></div>
-            
-            <div class="start-screen" id="startScreen">
-                <div class="game-instructions">
-                    <h2>游戏说明</h2>
-                    <p>点击黄色方块获得10分，点击粉色方块获得20分。</p>
-                    <p>按顺序点击"少年得到7周年生日快乐"可以获得额外奖励！</p>
-                    <p>错过方块或点击错误方块游戏结束。</p>
-                </div>
-                <div class="button-container">
-                    <button class="start-btn" id="startBtn">开始游戏</button>
-                    <button class="leaderboard-btn" id="leaderboardBtn">查看排行榜</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="leaderboardModal" class="leaderboard-modal">
-            <div class="leaderboard-content">
-                <h2>排行榜</h2>
-                <div class="tab-container">
-                    <button class="tab-btn active" id="scoreTab">分数排行</button>
-                    <button class="tab-btn" id="timeTab">时间排行</button>
-                </div>
-                <div id="leaderboardList" class="leaderboard-list"></div>
-                <button class="close-btn" id="closeLeaderboard">关闭</button>
+        <div id="gameContainer" class="game-container">
+            <div class="start-screen">
+                <h2>游戏说明</h2>
+                <p>1. 错过或点错金色方块即游戏结束</p>
+                <p>2. 金色方块($、￥、💰)10分，特殊文字方块20-100分</p>
+                <p>3. 按顺序收集"7周年生日快乐"即可通关</p>
+                <p>4. 排行榜上匿名用户组成祝福语可触发礼花哦</p>
+                <div class="start-btn" id="startBtn">开始游戏</div>
+                <div class="leaderboard-btn" id="showLeaderboard">查看排行榜</div>
             </div>
         </div>
     </div>
 
+    <div id="leaderboardModal" class="modal">
+        <div class="leaderboard-content">
+            <h2>排行榜</h2>
+            <div class="tab-container">
+                <button class="tab-btn active" data-tab="score">分数排行</button>
+                <button class="tab-btn" data-tab="time">时间排行</button>
+            </div>
+            <div id="scoreLeaderboard" class="leaderboard-list"></div>
+            <div id="timeLeaderboard" class="leaderboard-list" style="display: none;"></div>
+            <button class="close-btn">关闭</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@fireworks-js/web@2.10.7/dist/index.umd.js"></script>
     <script src="game.js"></script>
     <script>
-        // 等待DOM和游戏脚本完全加载
-        window.addEventListener('load', function() {
-            try {
-                const gameContainer = document.getElementById('game-container');
-                if (!gameContainer) {
-                    console.error('Game container not found');
-                    return;
-                }
-
-                const game = new Game(gameContainer);
-                
-                // 添加事件监听器
-                const elements = {
-                    startBtn: document.getElementById('startBtn'),
-                    leaderboardBtn: document.getElementById('leaderboardBtn'),
-                    closeLeaderboard: document.getElementById('closeLeaderboard'),
-                    scoreTab: document.getElementById('scoreTab'),
-                    timeTab: document.getElementById('timeTab')
-                };
-
-                // 检查所有必需的元素是否存在
-                for (const [key, element] of Object.entries(elements)) {
-                    if (!element) {
-                        console.error(`${key} not found`);
-                        return;
-                    }
-                }
-
-                // 添加事件监听器
-                elements.startBtn.addEventListener('click', () => game.start());
-                elements.leaderboardBtn.addEventListener('click', () => game.showLeaderboard());
-                elements.closeLeaderboard.addEventListener('click', () => game.hideLeaderboard());
-                elements.scoreTab.addEventListener('click', () => game.showScoreLeaderboard());
-                elements.timeTab.addEventListener('click', () => game.showTimeLeaderboard());
-            } catch (error) {
-                console.error('Error initializing game:', error);
-            }
-        });
+        new Game();
     </script>
 </body>
 </html> 

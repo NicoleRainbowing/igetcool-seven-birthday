@@ -28,6 +28,9 @@ class Game {
         this.goldSymbols = ['$', '￥', '💰'];  // 减少为三种字符
         this.currentScore = null;  // 添加当前分数记录
         this.currentPlayerName = null;  // 添加当前玩家名称记录
+        this.bonusScores = [20, 40, 60, 80, 100]; // 定义加分块分数池
+        this.requiredSequence = ['7', '周', '年', '生', '日', '快', '乐'];
+        this.collectedSequence = [];
     }
 
     init() {
@@ -120,34 +123,41 @@ class Game {
     }
 
     handleTileClick(tile) {
-        if (!tile.classList.contains('gold-tile') && !tile.classList.contains('bonus-tile')) {
-            this.gameOver();
-            return;
-        }
+        if (!this.gameRunning) return;
 
         if (tile.classList.contains('bonus-tile')) {
             const word = tile.dataset.word;
-            if (this.bonusWords[this.bonusProgress.length] === word) {
-                this.bonusProgress.push(word);
-                this.score += Math.floor(Math.random() * 5 + 1) * 20;
-                this.updateProgressDisplay();
+            const currentChar = word;
+            const expectedChar = this.requiredSequence[this.collectedSequence.length];
+
+            // 检查是否是正确的顺序
+            if (currentChar === expectedChar) {
+                this.collectedSequence.push(currentChar);
+                this.score += this.getRandomBonusScore();
                 
-                if (this.bonusProgress.length === this.bonusWords.length) {
+                // 检查是否完成收集
+                if (this.collectedSequence.length === this.requiredSequence.length) {
                     this.gameWin();
                 }
             } else {
-                this.bonusProgress = [];
-                this.messageElement.textContent = '顺序错误，重新开始收集';
+                // 顺序错误时，只提示而不结束游戏
+                this.messageElement.textContent = '顺序错误，继续收集"7周年生日快乐"';
                 setTimeout(() => {
                     this.updateProgressDisplay();
                 }, 1500);
             }
         } else {
+            // 普通金色块
             this.score += 10;
         }
 
-        this.scoreElement.textContent = this.score;
+        // 点击后隐藏方块
         tile.style.visibility = 'hidden';
+        
+        // 更新分数显示
+        this.scoreElement.textContent = this.score;
+        
+        // 根据分数调整游戏速度
         this.tileSpeed = 1.5 + Math.floor(this.score / 150) * 0.3;
     }
 
@@ -169,11 +179,13 @@ class Game {
             const newTop = currentTop + this.tileSpeed;
             tile.style.top = newTop + 'px';
 
+            // 只有当金色块（非汉字块）未被点击且超出边界时才结束游戏
             if (currentTop > 400) {
                 if (tile.classList.contains('gold-tile') && tile.style.visibility !== 'hidden') {
                     this.gameOver();
                     return;
                 }
+                // 移除超出边界的块
                 this.container.removeChild(tile);
                 this.tiles = this.tiles.filter(t => t !== tile);
             }
@@ -347,7 +359,7 @@ class Game {
                 <p>1. 错过或点错金色方块即游戏结束</p>
                 <p>2. 金色方块10分，特殊文字方块20-100分</p>
                 <p>3. 顺序收集"少年得到7周年生日快乐"可进入通关计时榜</p>
-                <p>4. 同IP匿名在排行榜上刷出收集文字有特殊奖励</p>
+                <p>4. 排行榜上匿名用户组成祝福语可触发礼花哦</p>
                 <div class="start-btn" id="startBtn">开始游戏</div>
                 <div class="leaderboard-btn" id="showLeaderboard">查看排行榜</div>
             </div>
@@ -362,11 +374,12 @@ class Game {
     }
 
     updateProgressDisplay() {
-        const progress = this.bonusWords.map((word, index) => {
-            if (index < this.bonusProgress.length) {
-                return `<span style="color: #FF4F00">${word}</span>`;
+        const progress = this.requiredSequence.map((char, index) => {
+            const collected = this.collectedSequence.includes(char);
+            if (collected) {
+                return `<span style="color: #FF4F00">${char}</span>`;
             }
-            return `<span style="color: #999">${word}</span>`;
+            return `<span style="color: #999">${char}</span>`;
         }).join('');
         
         this.messageElement.innerHTML = `收集进度：${progress}`;
@@ -493,6 +506,10 @@ class Game {
         } catch (error) {
             console.error('Error playing confetti:', error);
         }
+    }
+
+    getRandomBonusScore() {
+        return this.bonusScores[Math.floor(Math.random() * this.bonusScores.length)];
     }
 }
 

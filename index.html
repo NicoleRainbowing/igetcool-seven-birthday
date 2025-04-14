@@ -4,28 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>七周年生日快乐</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="public/style.css">
 </head>
 <body>
     <div class="container">
+        <!-- Logo -->
+        <div class="logo-container">
+            <img src="public/logo.png" alt="少年得到" class="logo">
+        </div>
+        
+        <!-- 游戏信息 -->
         <div class="header">
             <div class="score">分数: <span id="score">0</span></div>
             <div class="best-score">最高分: <span id="bestScore">0</span></div>
             <div class="time">时间: <span id="time">0:00</span></div>
         </div>
-        <div id="gameContainer" class="game-container">
+
+        <!-- 游戏容器 -->
+        <div id="game-container" class="game-container">
             <div class="start-screen">
                 <h2>游戏说明</h2>
-                <p>1. 错过或点错金色方块即游戏结束</p>
-                <p>2. 金色方块($、￥、💰)10分，特殊文字方块20-100分</p>
-                <p>3. 按顺序收集"7周年生日快乐"即可通关</p>
-                <p>4. 排行榜上匿名用户组成祝福语可触发礼花哦</p>
+                <p>1. 点击金色方块($、￥)获得10分</p>
+                <p>2. 特殊文字方块20-100分</p>
+                <p>3. 按顺序点击"少年得到7周年生日快乐"触发礼花</p>
+                <p>4. 错过金色方块游戏结束</p>
                 <div class="start-btn" id="startBtn">开始游戏</div>
                 <div class="leaderboard-btn" id="showLeaderboard">查看排行榜</div>
             </div>
         </div>
     </div>
 
+    <!-- 排行榜弹窗 -->
     <div id="leaderboardModal" class="modal">
         <div class="leaderboard-content">
             <h2>排行榜</h2>
@@ -40,7 +49,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@fireworks-js/web@2.10.7/dist/index.umd.js"></script>
-    <script src="game.js"></script>
+    <script src="public/game.js"></script>
     <script>
         new Game();
     </script>

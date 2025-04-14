@@ -161,7 +161,7 @@ body {
     color: #333;
 }
 
-/* 排行榜样式 */
+/* 排行榜弹窗样式 */
 .modal {
     display: none;
     position: fixed;
@@ -177,45 +177,121 @@ body {
 
 .leaderboard-content {
     background: white;
-    padding: 20px;
-    border-radius: 20px;
+    padding: 30px;
+    border-radius: 25px;
     width: 90%;
     max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
+.leaderboard-content h2 {
+    color: var(--hermes-orange);
+    margin-bottom: 20px;
+    font-size: 24px;
+    text-align: center;
+}
+
+/* 标签切换样式 */
 .tab-container {
     display: flex;
     margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
 }
 
 .tab-btn {
     flex: 1;
-    padding: 10px;
+    padding: 10px 20px;
     border: none;
     background: none;
     cursor: pointer;
     color: #666;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
 }
 
 .tab-btn.active {
     color: var(--hermes-orange);
-    border-bottom: 2px solid var(--hermes-orange);
+    border-bottom: 3px solid var(--hermes-orange);
+}
+
+/* 排行榜列表样式 */
+.leaderboard-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 20px;
 }
 
 .leaderboard-entry {
     display: flex;
-    padding: 10px;
-    border-bottom: 1px solid #eee;
+    align-items: center;
+    padding: 12px 15px;
+    margin: 8px 0;
+    background: rgba(255, 79, 0, 0.05);
+    border-radius: 10px;
+    transition: all 0.3s ease;
 }
 
+.leaderboard-entry:hover {
+    transform: translateX(5px);
+    background: rgba(255, 79, 0, 0.1);
+}
+
+.rank {
+    width: 30px;
+    font-weight: bold;
+    color: var(--hermes-orange);
+}
+
+.name {
+    flex: 1;
+    padding: 0 15px;
+    color: #333;
+}
+
+.value {
+    font-weight: bold;
+    color: var(--hermes-orange);
+}
+
+/* 关闭按钮样式 */
 .close-btn {
-    margin-top: 20px;
-    padding: 10px 20px;
+    display: block;
+    width: 100%;
+    padding: 12px;
     border: none;
     background: var(--hermes-orange);
     color: white;
     border-radius: 20px;
+    font-size: 16px;
+    font-weight: bold;
     cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+    background: var(--hermes-orange-light);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 79, 0, 0.3);
+}
+
+/* 添加滚动条样式 */
+.leaderboard-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.leaderboard-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.leaderboard-list::-webkit-scrollbar-thumb {
+    background: var(--hermes-orange);
+    border-radius: 4px;
+}
+
+.leaderboard-list::-webkit-scrollbar-thumb:hover {
+    background: var(--hermes-orange-light);
 }
 
 /* 响应式设计 */

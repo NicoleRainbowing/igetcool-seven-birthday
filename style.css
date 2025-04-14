@@ -339,4 +339,24 @@ body {
 
 .start-btn:hover {
     animation: none;
+}
+
+.tile.gold {
+    background-color: #FFD700;
+    color: #000;
+}
+
+.tile.pink {
+    background-color: #FFC0CB;
+    color: #000;
+}
+
+#collection-progress {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
 } 
